@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Poppins } from "next/font/google";
 
 import { useTRPC } from "@/trpc/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -33,6 +33,7 @@ const poppins = Poppins({
 
 export const SignUpView = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const trpc = useTRPC();
   const register = useMutation(
@@ -40,7 +41,8 @@ export const SignUpView = () => {
       onError: (error) => {
         toast.error(error.message);
       },
-      onSuccess: () => {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.auth.session.queryFilter());
         router.push("/");
       },
     })
