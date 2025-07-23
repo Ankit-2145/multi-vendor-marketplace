@@ -2,6 +2,7 @@
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { payloadCloudPlugin } from "@payloadcms/payload-cloud";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { multiTenantPlugin } from "@payloadcms/plugin-multi-tenant";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
@@ -10,8 +11,10 @@ import sharp from "sharp";
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Tags } from "./collections/Tags";
+import { Tenants } from "./collections/Tenants";
 import { Products } from "./collections/Products";
 import { Categories } from "./collections/Categories";
+import { User } from "./payload-types";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -23,7 +26,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Tags],
+  collections: [Users, Media, Categories, Products, Tags, Tenants],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
@@ -35,6 +38,16 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
+    multiTenantPlugin({
+      collections: {
+        products: {},
+      },
+      tenantsArrayField: {
+        includeDefaultField: false,
+      },
+      userHasAccessToAllTenants: (user) =>
+        Boolean((user as User)?.roles?.includes("super-admin")),
+    }),
     // storage-adapter-placeholder
   ],
 });

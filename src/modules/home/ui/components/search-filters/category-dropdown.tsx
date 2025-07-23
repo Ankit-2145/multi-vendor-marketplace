@@ -1,12 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
-import { useDropdownPosition } from "./use-dropdown-position";
 import { SubCategoryMenu } from "./subcategory-menu";
-import Link from "next/link";
 import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 interface Props {
@@ -22,7 +21,6 @@ export const CategoryDropdown = ({
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { getDropdownPosition } = useDropdownPosition(dropdownRef);
 
   const onMouseEnter = () => {
     if (category.subcategories) {
@@ -31,8 +29,6 @@ export const CategoryDropdown = ({
   };
 
   const onMouseLeave = () => setIsOpen(false);
-
-  const dropdownPosition = getDropdownPosition();
 
   // const toggleDropdown = () => {
   //   if (category.subcategories?.docs?.length) {
@@ -72,11 +68,7 @@ export const CategoryDropdown = ({
         )}
       </div>
 
-      <SubCategoryMenu
-        category={category}
-        isOpen={isOpen}
-        position={dropdownPosition}
-      />
+      <SubCategoryMenu category={category} isOpen={isOpen} />
     </div>
   );
 };
